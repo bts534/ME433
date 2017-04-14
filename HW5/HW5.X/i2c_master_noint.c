@@ -2,6 +2,8 @@
 // The functions must be callled in the correct order as per the I2C protocol
 // Change I2C1 to the I2C channel you are using
 // I2C pins need pull-up resistors, 2k-10k
+#include <xc.h> // processor SFR definitions
+#include <sys/attribs.h> // __ISR macro
 
 void i2c_master_setup(void) {
   I2C2BRG = 0x02C;            // I2CBRG = [1/(2*Fsck) - PGD]*Pblck - 2 
@@ -38,7 +40,7 @@ void i2c_master_ack(int val) {        // sends ACK = 0 (slave should send anothe
                                       // or NACK = 1 (no more bytes requested from slave)
     I2C2CONbits.ACKDT = val;          // store ACK/NACK in ACKDT
     I2C2CONbits.ACKEN = 1;            // send ACKDT
-    while(I2C1CONbits.ACKEN) { ; }    // wait for ACK/NACK to be sent
+    while(I2C2CONbits.ACKEN) { ; }    // wait for ACK/NACK to be sent
 }
 
 void i2c_master_stop(void) {          // send a STOP:

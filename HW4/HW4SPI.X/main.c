@@ -73,7 +73,7 @@ void makeWaveforms() {
 }
 
 int main() {
-
+    I2C2CON
 __builtin_disable_interrupts();
 
 // set the CP0 CONFIG register to indicate that kseg0 is cacheable (0x3)
