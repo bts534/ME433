@@ -200,21 +200,35 @@ int count =-100;
         accelX = (data[9] << 8) | data[8];
         accelY = (data[11] << 8) | data[10];
         accelZ = (data[13] << 8) | data[12];
+        
+        gyroX = gyroX * 35 / 1000; // 1000 dps sensitivity; mdps/LSB
+        gyroY = gyroY * 35 / 1000;
+        gyroZ = gyroZ * 35 / 1000;
+        
+        accelX = accelX * 0.061 * 9.8 / 1000; // 2g sensitivity ; units are mg
+        accelY = accelY * 0.061 * 9.8 / 1000;
+        accelZ = accelZ * 0.061 * 9.8 / 1000;
 
         sprintf(msg, "T: %3.3f", (float) temperature);
         draw_string(msg,40,50,BLUE, WHITE);
         
-        sprintf(msg, "X: %d", gyroX);
+        sprintf(msg, "X: %3.3f", (float)gyroX);
         draw_string(msg,40,60,RED, WHITE);
         
-        sprintf(msg, "Y: %d", gyroY);
+        sprintf(msg, "Y: %3.3f", (float)gyroY);
         draw_string(msg,40,70,RED, WHITE);
         
-        sprintf(msg, "Z: %d", gyroZ);
+        sprintf(msg, "Z: %3.3f", (float)gyroZ);
         draw_string(msg,40,80,RED, WHITE);
         
-        sprintf(msg, "aX: %d", accelX);
+        sprintf(msg, "aX: %3.3f", (float)accelX);
         draw_string(msg,40,90,BLACK, WHITE);
+        
+        sprintf(msg, "aY: %3.3f", (float)accelY);
+        draw_string(msg,40,100,BLACK, WHITE);
+        
+        sprintf(msg, "aZ: %3.3f", (float)accelZ);
+        draw_string(msg,40,110,BLACK, WHITE);
         
 
         
