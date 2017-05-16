@@ -183,11 +183,11 @@ int count =-100;
     while(1) {
         _CP0_SET_COUNT(0);
         
-        while (_CP0_GET_COUNT() < 480000000/2/5) {}
+        while (_CP0_GET_COUNT() < 480000000/2/5/20) {}
         // code for debugging, should print 105 to the screen if connection working
         I2C_read_multiple(SLAVE_ADDR, WHO_AM_I, data, 2);
 
-        sprintf(msg, "T: %d", data[0]);
+        sprintf(msg, "WHOAMI: %d", data[0]);
         draw_string(msg,40,30,BLUE, WHITE);
 
         I2C_read_multiple(SLAVE_ADDR, OUT_TEMP_L, data, 14);
@@ -201,38 +201,40 @@ int count =-100;
         accelY = (data[11] << 8) | data[10];
         accelZ = (data[13] << 8) | data[12];
         
-        gyroX = gyroX * 35 / 1000; // 1000 dps sensitivity; mdps/LSB
-        gyroY = gyroY * 35 / 1000;
-        gyroZ = gyroZ * 35 / 1000;
+        gyroX = gyroX * 35 ; // 1000 dps sensitivity; mdps/LSB
+        gyroY = gyroY * 35 ;
+        gyroZ = gyroZ * 35 ;
         
-        accelX = accelX * 0.061 * 9.8 / 1000; // 2g sensitivity ; units are mg
-        accelY = accelY * 0.061 * 9.8 / 1000;
-        accelZ = accelZ * 0.061 * 9.8 / 1000;
+        accelX = accelX * 0.061  ;// 2g sensitivity ; units are mg
+        accelY = accelY * 0.061 ;
+        accelZ = accelZ * 0.061 ;
 
-        sprintf(msg, "T: %3.3f", (float) temperature);
-        draw_string(msg,40,50,BLUE, WHITE);
+        //sprintf(msg, "T: %3.3f", (float) temperature);
+        //draw_string(msg,40,50,BLUE, WHITE);
         
-        sprintf(msg, "X: %3.3f", (float)gyroX);
-        draw_string(msg,40,60,RED, WHITE);
-        
-        sprintf(msg, "Y: %3.3f", (float)gyroY);
-        draw_string(msg,40,70,RED, WHITE);
-        
-        sprintf(msg, "Z: %3.3f", (float)gyroZ);
-        draw_string(msg,40,80,RED, WHITE);
-        
-        sprintf(msg, "aX: %3.3f", (float)accelX);
-        draw_string(msg,40,90,BLACK, WHITE);
-        
-        sprintf(msg, "aY: %3.3f", (float)accelY);
-        draw_string(msg,40,100,BLACK, WHITE);
-        
-        sprintf(msg, "aZ: %3.3f", (float)accelZ);
-        draw_string(msg,40,110,BLACK, WHITE);
+//        sprintf(msg, "X: %3.3f", (float)gyroX);
+//        draw_string(msg,40,60,RED, WHITE);
+//        
+//        sprintf(msg, "Y: %3.3f", (float)gyroY);
+//        draw_string(msg,40,70,RED, WHITE);
+//        
+//        sprintf(msg, "Z: %3.3f", (float)gyroZ);
+//        draw_string(msg,40,80,RED, WHITE);
+//        
+//        sprintf(msg, "aX: %3.3f", (float)accelX);
+//        draw_string(msg,40,90,BLACK, WHITE);
+//        
+//        sprintf(msg, "aY: %3.3f", (float)accelY);
+//        draw_string(msg,40,100,BLACK, WHITE);
+//        
+//        sprintf(msg, "aZ: %3.3f", (float)accelZ);
+//        draw_string(msg,40,110,BLACK, WHITE);
         
 
         
-        //draw_progress_bar(temperature,50,2,RED,WHITE);
+        draw_progress_bar(accelX/2.0,50,2,RED,WHITE);
+        
+        draw_progress_bar(accelY/2.0,70,2,BLUE,WHITE);
     }
     return 0;
 }
