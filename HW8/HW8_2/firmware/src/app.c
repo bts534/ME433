@@ -53,8 +53,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-#include "app.h"
 
+#include "app.h"
 // *****************************************************************************
 // *****************************************************************************
 // Section: Global Data Definitions
@@ -121,6 +121,11 @@ void APP_Initialize ( void )
     /* TODO: Initialize your application's state machine and other
      * parameters.
      */
+    
+    // make A4 an output pin
+    TRISAbits.TRISA4 = 0;
+    // set A4 to high
+    LATAbits.LATA4 = 1;
 }
 
 
@@ -154,7 +159,21 @@ void APP_Tasks ( void )
 
         case APP_STATE_SERVICE_TASKS:
         {
-        
+            // blink code
+            _CP0_SET_COUNT(0);
+            
+            LATAbits.LATA4 = 1;
+            
+            while (_CP0_GET_COUNT() < 12000) {
+                
+            }
+            
+            LATAbits.LATA4 = 0;
+            
+            while (_CP0_GET_COUNT() < 24000) {
+                
+            }
+            
             break;
         }
 
