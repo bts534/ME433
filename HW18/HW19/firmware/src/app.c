@@ -91,6 +91,10 @@ int rxPos = 0; // how much data has been stored
 int gotRx = 0; // flag
 int rxVal; // place to store the in thtat was received
 
+int motor1Value;
+int motor2Value; // direction and power for the two motors
+int motorCommandReceived; // flat
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Application Callback Functions
@@ -442,7 +446,9 @@ void APP_Tasks(void) {
                     if (appData.readBuffer[ii] == '\n' || appData.readBuffer[ii] == '\r') {
                         rx[rxPos] = ' '; //end the array
                                 
-                        sscanf(rx, "%d", &rxVal);
+                        sscanf(rx, "%d %d", &motor1Value, &motor2Value);
+                        motorCommandReceived = 1;
+                        
                         gotRx = 1; // set flag
                         break; // get out of while loop
                     } else if (appData.readBuffer[ii] == 0) {
@@ -476,10 +482,25 @@ void APP_Tasks(void) {
                 
                 // somewhere in APP_Tasks(), probably in case APP_STATE_SCHEDULE_READ
                 // when you read data from the host
-                LATAbits.LATA1 = 1; // direction
-                OC1RS = 600; // velocity, 50%
-                LATBbits.LATB3 = 0; // direction
-                OC4RS = 600; // velocity, 50%
+                 
+                if (motorCommandReceived) {
+                    if (motor1Value < 0) {
+                        LATAbits.LATA1 = 0; // direction
+                        OC1RS = -motor1Value;
+                    } else {
+                        LATAbits.LATA1 = 1;
+                        OC1RS = motor1Value;
+                    }
+                    if (motor2Value < 0) {
+                        LATBbits.LATB3 = 0; // direction
+                        OC4RS = -motor2Value;
+                    } else {
+                        LATBbits.LATB3 = 1;
+                        OC4RS = motor2Value;
+                    }
+                    
+                    motorCommandReceived = 0;
+                }
             }
 
             break;
@@ -498,12 +519,15 @@ void APP_Tasks(void) {
             appData.state = APP_STATE_WAIT_FOR_WRITE_COMPLETE;
 
             if (gotRx) {
-                len = sprintf(dataOut, "got: %d\r\n", rxVal);
+                len = sprintf(dataOut, "Motor command: %d %d\r\n", motor1Value, motor2Value);
+                
                 i++;
                 USB_DEVICE_CDC_Write(USB_DEVICE_CDC_INDEX_0,
                         &appData.writeTransferHandle,
                         dataOut, len,
                         USB_DEVICE_CDC_TRANSFER_FLAGS_DATA_COMPLETE);
+                
+                
                 rxPos=0;
                 gotRx=0;
             } else {

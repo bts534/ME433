@@ -30,7 +30,9 @@ import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
-    SeekBar myControl;
+    SeekBar seekBar1;
+    SeekBar seekBar2;
+
     TextView myTextView;
 
     Button button;
@@ -49,12 +51,46 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        myControl = (SeekBar) findViewById(R.id.seek1);
+        seekBar1 = (SeekBar) findViewById(R.id.seek1);
+        seekBar2 = (SeekBar) findViewById(R.id.seek2);
+
+        seekBar1.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                updateProgressTextView();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        seekBar2.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                updateProgressTextView();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
         myTextView = (TextView) findViewById(R.id.textView01);
         myTextView.setText("Enter whatever you Like!");
 
-        setMyControlListener();
 
         myTextView2 = (TextView) findViewById(R.id.textView02);
         myScrollView = (ScrollView) findViewById(R.id.ScrollView01);
@@ -64,11 +100,7 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                myTextView2.setText("value on click is "+myControl.getProgress());
-                String sendString = String.valueOf(myControl.getProgress()) + '\n';
-                try {
-                    sPort.write(sendString.getBytes(), 10); // 10 is the timeout
-                } catch (IOException e) { }
+                writeMotorCommands();
             }
 
         });
@@ -76,28 +108,59 @@ public class MainActivity extends AppCompatActivity {
         manager = (UsbManager) getSystemService(Context.USB_SERVICE);
     }
 
-    private void setMyControlListener() {
-        myControl.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+    private void updateProgressTextView() {
+        int progressChanged1 = (int) ((seekBar1.getProgress()-50)/100.0*2*1199);
+        int progressChanged2 = (int) ((seekBar2.getProgress()-50)/100.0*2*1199);
 
-            int progressChanged = 0;
 
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                progressChanged = progress;
-
-                myTextView.setText("The value is: "+progress);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
+        myTextView.setText("Motor 1: "+ progressChanged1 + " Motor 2: " + progressChanged2);
     }
+
+
+    private void writeMotorCommands() {
+        String[] sendStrings = new String[4];
+
+        // Convert to motorized PWM time
+        int progressChanged1 = (int) ((seekBar1.getProgress() - 50) / 100.0 * 2 * 1199);
+        int progressChanged2 = (int) ((seekBar2.getProgress() - 50) / 100.0 * 2 * 1199);
+
+//        // send the direction to the motor
+//        if (progressChanged1 < 0) {
+//            sendStrings[0] = "0\n";
+//            progressChanged1 = -progressChanged1; // prevent sending negative number
+//        } else {
+//            sendStrings[0] = "1\n";
+//        }
+//
+//        // send the amplitude
+//        sendStrings[1] = String.valueOf(progressChanged1) + '\n';
+//
+//        if (progressChanged2 < 0) {
+//            sendStrings[2] = "0\n";
+//            progressChanged2 = -progressChanged2; // prevent sending negative number
+//        } else {
+//            sendStrings[2] = "1\n";
+//        }
+//
+//        sendStrings[3] = String.valueOf(progressChanged2) + '\n';
+
+//        // send the four strings
+//        for (int i = 0; i < sendStrings.length; i++) {
+//            try {
+//                sPort.write(sendStrings[i].getBytes(), 10); // 10 is the timeout
+//                try{ Thread.sleep(250); }catch(InterruptedException e){ }
+//            } catch (IOException e) {
+//            }
+//        }
+
+        String sendString = String.valueOf(progressChanged1) + ' ' + String.valueOf(progressChanged2) + '\n';
+        try {
+            sPort.write(sendString.getBytes(), 10); // 10 is the timeout
+
+        } catch (IOException e) {
+        }
+    }
+
 
 
     private final SerialInputOutputManager.Listener mListener =
